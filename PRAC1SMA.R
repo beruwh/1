@@ -1,135 +1,169 @@
-#Q1
- 
-install.packages("markovchain")
+# 1)Consider a sequence of items from a production process, with each item being graded as good or defective.
+#Suppose that a good item is followed by another good item with probability α and a defective item is followed by 
+#another defective item with probability β. 
+#Define a Markov chain in R having states "Good Item" and "Defective Item". Give name
+#"Practical 2 - Q.1 - Production Process" to the process. Take α = 0.8 and β = 0.4. If the first item is good,
+#what is the probability that the first defective item to appear is the fifth item? 
 
-library(markovchain)
-
-p <- matrix(data = c(0.4,0.6,0.2,0.8),byrow = T,
-            nrow = 2);p
-
-pp <- new("markovchain", transitionMatrix = p);pp
-
-#here we need to change the name of the markov chain
-#as well as the state space
-
-pp <-  new("markovchain",states = c("Defective Item","Good Item"),
-           transitionMatrix = p,name = "Practical 2 Q.1 - Production Process");pp
-
-# to see the TPM in the transitional form
+#code:
+# Xn: state of the nth item
+# State Space : s={1,2} or{Defective item,Good item}
+# Tpm: P=(o.4,0.6//0.2,0.8)
+p=matrix(data=c(0.4,0.6,0.2,0.8),byrow=TRUE,nrow=2)
+p
+pp=new("markovchain",states=c("Defective item","Good item"),transitionMatrix=p,
+       name="Practical 2 - Q.1 - Production Process")
+pp
 plot(pp)
+states(pp)
+names(pp)
+pp[1,1]
+pp[1,2]
+ans_1=pp[2,2]^3*pp[2,1]
+ans_1
+# Comment:The Probability that the first defective item to appear is the fifth item is 0.1024
 
-#comment : The probability that the first defectiveitem to appear is the 
-# the fifth item is 0.1024
 
 #------------------------------------------------------------------------------------#
 
-#Q2
+# Q2)A DTMC {𝑋𝑛,𝑛 ≥ 0} on state space {0, 1, 2} has the following transition probability matrix:
+#       0.3	0.2	0.5
+#	𝑃 =  0.5	0.1	0.4 
+#     	0.5	0.2	0.3
+#and initial distribution 𝑝0 = 0.5 ,   𝑝1 = 0.5. Determine 
+#(i)	𝑃(𝑋0 = 1, 𝑋1 = 1,𝑋2 = 0).  
+#(ii)	𝑃(𝑋1 = 2, 𝑋2 = 0,𝑋3 = 0). 
+#(iii)	Probability distribution of 𝑋3. 
 
-m <- matrix(data = c(0.3,0.2,0.5,0.5,0.1,0.4,0.5,0.2,0.3),byrow = T,nrow = 3);m
-p <- new("markovchain",states = c("0","1","2"),transitionMatrix = m,name = "DTMC");p
+#code:
+# S={0,1,2}
+p=matrix(data=c(0.3,0.2,0.5,0.5,0.1,0.4,0.5,0.2,0.3),byrow=TRUE,nrow=3)
+p
+pp=new("markovchain",states=c("0","1","2"),transitionMatrix=p )
+pp
+plot(pp)
+a_0=c(0.5,0.5,0)
+a_1=a_0*pp
+a_1
+# i)
+ans=pp["1","0"]*pp["1","1"]*a_0[2]
+ans
+# ii)
+ans1=pp["2","0"]*pp["0","0"]*a_1[3]
+ans1
+# iii)
+ans2=a_0*pp^3
+ans2
+# Comment :𝑃(𝑋0 = 1, 𝑋1 = 1,𝑋2 = 0) = 0.025 𝑃(𝑋1 = 2, 𝑋2 = 0,𝑋3 = 0) = 0.075   
+#Probability distribution of 𝑋3 is {P[X3=0]=0.416,P[X3=1]=0.1815,P[X3=2]=0.4025}
 
-#i)
+ #------------------------------------------------------------------------------#
 
-p_0 <- c(0.5,0.5,0) #This vector represents the initial probabilities 
-#for each state: 50% chance of starting in state 0, 
-#50% chance in state 1, and 0% chance in state 2.
+# Q3)The transition probability matrix (TPM) for a Markov chain {Xn} is as follows: 
+#	        0	  1	   0
+#	𝑃 =  1⁄6	1/2  1/3
+#       	0	 2⁄3	1⁄3
+#(i)	Draw state transition diagram.  
+#(ii)	Find the marginal distribution of X3, given the initial distribution as 𝑎(0) = (1/3,2/3,0). 
+#code:
+p=matrix(data=c(0,1,0,1/6,0.5,1/3,0,2/3,1/3),byrow=TRUE,nrow=3)
+p
+pp=new("markovchain",states=c("0","1","2"),transitionMatrix=p )
+pp
+# i)
+plot(pp)
+a_0=c(1/3,2/3,0)
+a_0
+# ii)
+ans=a_0*pp^3
+ans
+# Comment:the marginal distribution of X3 is {P[X3=0]=0.09876543,P[X3=1]=0.6049383,P[X3=2]=0.2962963}
 
-ans_1 <- p_0[2]*p["1","1"]*p["1","0"];ans_1
+#----------------------------------------------------------------------------------------------------------#
 
-plot(p)
+# Q4) 4.	A recently completed survey of subscribers to a travel magazine shows that 65% of them have
+#at least one airline credit card. When compared with a similar survey taken 5 years ago,
+#the data indicates that 40% of those individuals who did not have an airline credit card subsequently
+#obtained one while 10% of those who carried such cards 5 years ago no longer do so. Assuming that these 
+#trends continue into the future, determine the proportion of subscribers who will own airline credit cards
+#(i) in 10 years, (ii) over the long run. 
 
-#ii)
+#code:
+# Xn: status of the person , is he holding a card or not at the 5*nth year
+# State space = S ={0,1}
+# Xn = 0  ; if the subscribers will own 0 credit card
+#    = 1  ; if the subscribers will own aleast 1 credit card
+p=matrix(data=c(0.6,0.4,0.1,0.9),byrow=TRUE,nrow=2)
+p
+pp=new("markovchain",states=c("0","1"),transitionMatrix=p)
+pp
+# i)
+a0=c(0.35,0.65)
+a2=a0*pp^2
+a2
+ans=a2[2]
+ans
+# ii)
+summary(pp)               
+is.irreducible(pp)       
+period(pp)                
+steadyStates(pp)         
+# for long run, using ergodic theorem , 
+#the limiting distibution is same as stationary distribution, hence we find steady states
+# Comment:the proportion of subscribers who will own airline credit cards
+#(i) in 10 years is 76.25%                                                                        
+#(ii) over the long run 20% and 80% will not hold the card 
 
-p_1 <- p_0*p;p_1
+#-----------------------------------------------------------------------------------------------#
 
-ans_2 <- p_1[3]*p["2","0"]*p["0","0"];ans_2
+# Q5)	The weather in a city is classified as sunny, cloudy, or rainy. 
+#Suppose that tomorrow’s weather depends only on today’s weather as follows: if it is sunny today, 
+#it is cloudy tomorrow with probability 0.3 and rainy with probability 0.2; if it is cloudy today, 
+#it is sunny tomorrow with probability 0.5 and rainy with probability 0.3; and finally, if it is rainy today,
+#it is sunny tomorrow with probability 0.4 and cloudy with probability 0.5.  
+#(i)	Given that today is rainy, what is the probability that day after tomorrow is rainy? 
+#(ii)	Given that today is cloudy, what is the probability that it will be sunny after 4 days? 
+#(iii)	What is the probability that day after tomorrow will be rainy? 
+#(iv)	What is the probability that it will be sunny after 4 days? 
 
-p_3 <- p_0*p^3;p_3
+#code:
+# Xn: state of the whether in the city at the nth day
+# Xn = 0   ; if the whether is sunny in the city
+#    = 1   ; if the whether is cloudy in the city
+#    = 2   ; if the whether is rainy in the city
+# State Space= S = {0,1,2}
+p<-matrix(data=c(0.5,0.3,0.2,0.5,0.2,0.3,0.4,0.5,0.1),byrow=TRUE,nrow=3)
+p
+pp<-new("markovchain",states=c("0","1","2"),transitionMatrix=p)
+pp
+# i)
+a<-pp^2
+a
+ans1<-a["2","2"]
+ans1
+# Comment: probability that day after tommorrow is rainy given that today is rainy is 0.24
+# ii)
+b<-pp^4
+b
+ans2<-b["1","0"]
+ans2
+# Comment: probability that  after 4 days is sunny given that today is cloudy is 0.4785
+# iii)
+a0<-c(1/3,1/3,1/3)     #intial distribution
+a0
+a2<-a0*a
+a2
+ans3<-a2[3]
+ans3
+# Comment: probability that day after tommorrow is rainy is 0.213333
+# iv)
+b4<-a0*b
+b4
+ans4<-b4[1]
+ans4
+# Comment: probability that  after 4 days is sunny is 0.4790667
 
-#i) P(X0 = 1,X1 = 1,X2 = 0) = 0.025
-#ii) P(X1 = 2,X2 = 0,X3 = 0) = 0.0675
-#iii) Prob dist of X3 is {0.416,0.1815,0.4025}
 
-#Q3
-
-#lets assume states are 0,1,2 hence, s = {0,1,2}
-m <- matrix(data = c(0,1,0,1/6,1/2,1/3,0,2/3,1/3),byrow = T,nrow = 3);m
-
-p <- new("markovchain",states = c("0","1","2"),transitionMatrix = m,name = "TPM");p
-
-#i)
-
-plot(p)
-
-#ii)
-
-p_0 <- c(1/3,2/3,0);p_0
-
-p_3 <- p_0*p^3;p_3
-
-#comment: The marginal dist is {0.09876543,......,......}
-
-#Q4
-
-# here the state space is S = {0,1}
-
-m <- matrix(data = c(0.6,0.4,0.1,0.9),byrow = T,nrow = 2);m
-
-p <-  new("markovchain",states = c("0","1"),transitionMatrix = m,name = "TPM");p
-
-#i)
-
-# proportions of subscribers who will own the card in the 10 years
-#p[xn+2 = 1] = p11_(2)
-a_0 <- c(0.35,0.65);a_0
-
-p11_2 <- a_0*p^2;p11_2
-ans <- p11_2[1,2];ans
-
-#ii)
-
-summary(p)
-
-steadyStates(p)
-
-#Q5
-
-m <- matrix(c(0.5,0.3,0.2,0.5,0.2,0.3,0.4,0.5,0.1),byrow = T,nrow=3);m
-
-p <- new("markovchain",transitionMatrix = m,states = c("Sunny","cloudy","Rainy"),
-         name = "Weather");p
-
-plot(p)
-
-summary(p)
-
-#i) calculate the prob that the day after tommorow is rainy given that today is rainy
-
-c1 <-  p**2;c1
-
-ans1 <- c1[3,3];ans1
-
-#ii) calculate the prob that after 4 days it will be sunny given that today is cloudy
-
-c2 <- p**4;c2
-
-ans2 <- c2[2,1];ans2
-
-#iii) Calculate the prob that the day after tommorow is rainy starting from an
-#equal initial distibution 
-
-a0 <- c(1/3,1/3,1/3);a0
-
-a2 <- a0*c1;a2
-
-ans3 <- a2[3];ans3
-
-#iv) calculate the prob that after 4 days it will be sunny starting from
-#an equal initial dist
-
-b <- a0 * c1;b
-
-ans4 <- b[1];ans4
 
 
 
