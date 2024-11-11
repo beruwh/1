@@ -192,30 +192,47 @@ optim(fn = logl,par = theta_ini)
 #100 and 150 and estimate the parameters.
 #c. Comment on the results.
 #ANS: 
-
-#a)
-
-x <- c(11,11,11,10,8,11,9,10,5,11,13,16,10,9,12,12,8,9,10,14,10,7,2,11,13,16,10,11,10,3,5,11,5,12,7)
-m <- mean(x);m
-v <- var(x);v
-
-#since mean and variance are approximately same therefore its a  poisson model
-
-nll.pois <- function(l){
-  -sum(dpois(x,l = l,log = T))
+library(stats4)
+library(methods)
+library(prevtoinc) 
+# a)
+set.seed(100)
+x<-c(11,11,11,10,8,11,9,10,5,11,13,16,10,9,12,12,8,9,10,14,10,7,2,11,13,16,10,11,10,3,5,11,5,12,7)
+x
+mu<-mean(x)
+mu
+var<-var(x)
+var
+nll.pois <- function(lambda)
+{
+  -sum(dpois(x,lambda=lambda,log=TRUE))
 }
-optim(fn = nll.pois,par = c(l = 8.9),method = "BFGS")
+optim(fn=nll.pois,par=c(lambda=0.5),method="BFGS")
 
-#b)
-
-rs <- rpois(100,9.8)
-logl <- function(l){
-  -sum(dpois(rs,l = l,log = T))
+# b)
+# for size 100
+set.seed(101)
+N <- 100
+x<-rpois(N,9.8)
+x
+nll.pois <- function(lambda)
+{
+  -sum(dpois(x,lambda=lambda,log=TRUE))
 }
-optim(fn = logl,par = c(l = 8.9,log = T))
+optim(nll.pois,par=c(lambda=0.5),method="BFGS")
 
-#c) comment
-#as the sample size inc the estimator of lambda falls closer to the true value of lambda
+# for size 150
+#set.seed(101)
+N<-150
+x<-rpois(N,9.8)
+x
+nll.pois<-function(lambda)
+{
+  -sum(dpois(x,lambda = lambda,log=TRUE))
+}
+optim(nll.pois,par=c(lambda=0.5),method="BFGS")
+# c)
+# comment: As the sample size increases, MLE becomes approximately equal to lambda
 
 
 #Q5 Generate samples of sizes 50, 100 and 120 from the following distributions and estimate the 
