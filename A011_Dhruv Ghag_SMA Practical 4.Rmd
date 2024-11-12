@@ -1,0 +1,310 @@
+---
+title: "SMA Practical 4"
+author: "A011_Dhruv Ghag_SMA Practical 4"
+date: "2024-09-25"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Q1) A population begins with a single individual. In each generation, each individual in the population dies with probability p0 = ½ or doubles with probability p2 = ½. Let 𝑋𝑛 denote the number of individuals in the population in the 𝑛𝑡ℎ generation. Determine the probability that the population is extinct by the n𝑡ℎ generation for 𝑛 = 1,2,3,4,5. Find the probability of ultimate extinction by (i) iterative procedure (ii) solving s = P(s).                        Verify graphically.                                                                             Compare the results when (a) p0 = 0.8, (ii) p0= 0.25.
+
+# code
+p0=0.5
+p2=0.5
+u=c()
+u[1]=p0
+for (i in 1:4){
+  u[i+1]=p0*u[i]^0 + p2*u[i]^2
+}
+print(round(u,4))
+# There is 78 % chances that the population will die out in 5th generation
+
+# i)
+# a)
+p0=0.8
+p2=1-p0
+u=c()
+u[1]=p0
+i=1
+while (i>=1) {
+  u[i+1]=p0*u[i]^0 + p2*u[i]^2
+  if (abs(u[i+1]-u[i])<0.0001){
+    cat("converges to",u[i+1])
+    break
+  }
+  i=i+1
+}
+print(round(u,5))
+
+# b)
+p0=0.25
+p2=1-p0
+u=c()
+u[1]=p0
+i=1
+while (i>=1) {
+  u[i+1]=p0*u[i]^0 + p2*u[i]^2
+  if (abs(u[i+1]-u[i])<0.0001){
+    cat("converges to",u[i+1])
+    break
+  }
+  i=i+1
+}
+print(round(u,5))
+# another way
+p0=0.25
+p2=1-p0
+u=c()
+compar=10^-6
+diff=1
+i=0
+uold=p0
+while(diff>compar){
+  unew=p0+p2*uold^2
+  diff=abs(unew-uold)
+  u=rbind(u,c(i,uold))
+  uold=unew
+  i=i+1
+}
+print(u)
+
+# ii)
+# polyroot()
+# a)
+roots<-polyroot(c(0.8,-1,0.2))
+print(paste("the solution of s for which ultimate extinction is attained",round(Re(roots[1]),4)))
+roots
+# b)
+roots<-polyroot(c(0.25,-1,0.75))
+print(paste("the solution of s for which ultimate extinction is attained",round(Re(roots[1]),4)))
+roots
+# p0 =0.5
+pgf<-function(s){
+  p0+p2*s^2
+}
+p0=0.5
+p2=1-p0
+s1=c()
+ps1=c()
+for(s in seq(0,1,0.1)){
+  ps=pgf(s)
+  s1=cbind(s1,s)
+  ps1=cbind(ps1,ps)
+}
+plot(s1,ps1,type='l',ylim=c(0,1))
+lines(s1,s1,col="red")
+
+# p0 =0.8
+pgf<-function(s){
+  p0+p2*s^2
+}
+p0=0.8
+p2=1-p0
+s1=c()
+ps1=c()
+for(s in seq(0,1,0.1)){
+  ps=pgf(s)
+  s1=cbind(s1,s)
+  ps1=cbind(ps1,ps)
+}
+plot(s1,ps1,type='l',ylim=c(0,1))
+lines(s1,s1,col="red")
+
+# p0 =0.25
+pgf<-function(s){
+  p0+p2*s^2
+}
+p0=0.25
+p2=1-p0
+s1=c()
+ps1=c()
+for(s in seq(0,1,0.1)){
+  ps=pgf(s)
+  s1=cbind(s1,s)
+  ps1=cbind(ps1,ps)
+}
+plot(s1,ps1,type='l',ylim=c(0,1))
+lines(s1,s1,col="red")
+
+```
+
+```{r}
+# Q2) A branching process has offspring distribution a = (1/5, 2/5, 2/5) where a discrete r.v. X takes values {0,1,2}.                                                                               Find the following –                                                                             i. Mean of offspring distribution.                                                               ii. P(s), probability generating function of offspring distribution.                            iii. The probability of ultimate extinction. Verify graphically.
+
+# code:
+prob=c(1/5,2/5,2/5)
+values=c(0,1,2)
+# i)
+mean_offspring=sum(prob*values)
+mean_offspring
+# ii)
+PGF<-function(s){
+  p0<-1/5
+  p1<-2/5
+  p2<-2/5
+  P_S<-p0+(p1*s)+(p2*s^2)
+  return(P_S)
+}
+PGF(values)
+# iii)
+# The equation is 2*s^2-3*s+1=0
+a<-2
+b<--3
+c<-1
+roots<-c((-b+sqrt(b^2-4*a*c))/(2*a),(-b-sqrt(b^2-4*a*c))/(2*a))
+roots
+# Extinction Probability=0.5
+
+s<-seq(0,1,by=0.01)
+x<-PGF(seq(0,1,by=0.01))
+x
+
+plot(s,x,type="l",col="blue",ylim=c(0,1),
+     xlab="s",ylab="PGF",main="PGF and y=s")
+lines(s,s,col="red")
+
+
+```
+```{r}
+# Q3) A branching process has offspring distribution a = (1/6, 1/2, 1/3) where a discrete r.v. X takes values {0,1,2}.                                                                          Find the following –                                                                            i. Mean of offspring distribution.                                                              ii. G(s), probability generating function of offspring distribution.                          iii. The probability of ultimate extinction. Verify graphically
+
+# code:
+# Q3)
+a1<-c(1/6,1/2,1/3)
+x1<-c(0,1,2)
+# i)
+mean_offspring1=sum(a1*x1)
+mean_offspring1
+# ii)
+PGF1<-function(s){
+  p0<-1/6
+  p1<-1/2
+  p2<-1/3
+  G_S<-p0+(p1*s)+(p2*s^2)
+  return(G_S)
+}
+PGF1(x1)
+# iii)
+# The equation is 2*s^2-3*s+1=0
+a<-2
+b<--3
+c<-1
+roots<-c((-b+sqrt(b^2-4*a*c))/(2*a),(-b-sqrt(b^2-4*a*c))/(2*a))
+roots
+# Extinction Probability=0.5
+
+s<-seq(0,1,by=0.01)
+x<-PGF1(seq(0,1,by=0.01))
+x
+
+plot(s,x,type="l",col="blue",ylim=c(0,1),
+     xlab="s",ylab="PGF",main="PGF and y=s")
+lines(s,s,col="red")
+
+```
+
+```{r}
+# Q4) Assume the offspring distribution is uniform on {0, 1, 2, …, k}. Find the probability of ultimate extinction when k = 4, 8.
+
+#code:
+roots<-polyroot(c(-1,4+1,-(4+1),0,1))
+paste("The probability of ultimate extinction is ",round(Re(roots[1]),4))
+roots<-polyroot(c(-1,8+1,-(8+1),0,1))
+paste("The probability of ultimate extinction is ",round(Re(roots[1]),4))
+root_fn=function(N){
+  a=-1
+  b=N+1
+  c=-(N+1)
+  n_zeros=N-3
+  d=1
+  vector<-c(a,b,c,rep(0,N-3),d)
+  return(Re(polyroot(vector)))
+}
+root_fn(4)
+root_fn(8)
+```
+
+```{r}
+# Q5) Find probability of ultimate extinction whose offspring distribution is Poisson with parameter lambda = 0.75, 0.3  .
+
+# code:
+library(nleqslv)
+#Offspring ditribution is poisson wih parameter lambda= 0.75,0.3
+# a) lambda = 0.75
+mu=0.75
+pgf<-function(s){
+  exp(0.75*(s-1))
+}
+
+s1=c(); ps=c(); ## defining null vectors that will be further used
+for (s in seq(0,1,0.1)){
+  p.1=pgf(s) ## using pgf function defined above
+  s1=rbind(s1,s)
+  ps=rbind(ps,p.1)
+}
+#extinction probability
+ep=function(s){log(s)+0.8*(1-s)}
+nleqslv(0.001,fn=ep,method = "Newton") $x
+
+# b) lambda = 0.3
+mu=0.3
+pgf<-function(s){
+  exp(0.3*(s-1))
+}
+s1=c(); ps=c(); 
+for (s in seq(0,1,0.1)){
+  p.1=pgf(s) ## using pgf function defined above
+  s1=rbind(s1,s)
+  ps=rbind(ps,p.1)
+}
+
+#extinction probability
+epb=function(s){log(s)+0.3*(1-s)}
+nleqslv(0.001,fn=epb,method = "Newton") $x
+
+
+```
+
+```{r}
+# Q6) Find probability of ultimate extinction whose offspring distribution is geometric with parameter p = 0.9, 0.4     .
+
+# code:
+library(nleqslv)
+#Offspring ditribution is geometric wih parameter p= 0.9,0.4
+# a) p = 0.9
+p=0.9
+pgf <- function(s, p) {
+  p * s / (1 - (1-p) * s)
+}
+
+s1=c(); ps=c(); ## defining null vectors that will be further used
+for (s in seq(0,1,0.1)){
+  p.1=pgf(s,p) ## using pgf function defined above
+  s1=rbind(s1,s)
+  ps=rbind(ps,p.1)
+}
+#extinction probability
+ep1=function(s){log(s) + log(p) - log(1 - (1-p) * s)}
+nleqslv(0.001,fn=ep1,method = "Newton") $x
+
+# b) p = 0.4
+p=0.4
+pgf <- function(s, p) {
+  p * s / (1 - (1-p) * s)
+}
+
+s1=c(); ps=c(); ## defining null vectors that will be further used
+for (s in seq(0,1,0.1)){
+  p.1=pgf(s,p) ## using pgf function defined above
+  s1=rbind(s1,s)
+  ps=rbind(ps,p.1)
+}
+#extinction probability
+epq1=function(s){log(s) + log(p) - log(1 - (1-p) * s)}
+nleqslv(0.001,fn=epq1,method="Newton")$x
+```
+
