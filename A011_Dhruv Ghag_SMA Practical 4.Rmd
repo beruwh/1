@@ -1,9 +1,4 @@
----
-title: "SMA Practical 4"
-author: "A011_Dhruv Ghag_SMA Practical 4"
-date: "2024-09-25"
-output: word_document
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
